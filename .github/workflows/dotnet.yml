@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+env:
+  MY_DEMO_WEBAPP: mydemowebapp1 
 
 jobs:
   build:
@@ -23,3 +25,14 @@ jobs:
       run: dotnet build ${{github.workspace}}/gitactsite/gitactsite.csproj --no-restore
     - name: Test
       run: dotnet test ${{github.workspace}}/gitactsite/gitactsite.csproj --no-build --verbosity normal
+    - name: publish
+      run: dotnet publish ${{github.workspace}}/gitactsite/gitactsite.csproj -c Release -o dotnetcorewebapp
+    - name: deploy to azure webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.MY_DEMO_WEBAPP }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: './dotnetcorewebapp'
+      
+      
+      
